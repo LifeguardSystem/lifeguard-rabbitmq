@@ -1,1 +1,1 @@
-# lifeguard-rabbitmq
+# Lifeguard RabbitMQ
