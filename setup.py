@@ -10,7 +10,7 @@ setup(
     scripts=[],
     include_package_data=True,
     description="Lifeguard integration with RabbitMQ",
-    install_requires=["lifeguard==0.0.15"],
+    install_requires=["lifeguard"],
     classifiers=["Development Status :: 3 - Alpha"],
     packages=find_packages(),
 )
