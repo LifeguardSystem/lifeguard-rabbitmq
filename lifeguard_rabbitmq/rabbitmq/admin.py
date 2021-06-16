@@ -20,11 +20,7 @@ def count_consumers(instance_name, queue):
         __vhost(instance_attributes["vhost"]), queue
     )
     response = __get(url, instance_attributes["user"], instance_attributes["passwd"])
-
-    print("\n\n\n")
-    print(response)
-    print("\n\n\n")
-
+    
     return len(response["consumer_details"])
 
 
