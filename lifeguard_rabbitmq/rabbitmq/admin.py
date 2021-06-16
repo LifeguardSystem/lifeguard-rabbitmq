@@ -15,17 +15,32 @@ def count_consumers(instance_name, queue):
     """
     Get consumers for a queue
     """
-    instance_attributes = get_rabbitmq_admin_instances()[instance_name]
-    url = __url(QUEUE, instance_attributes["base_url"]).format(
-        __vhost(instance_attributes["vhost"]), queue
-    )
-    response = __get(url, instance_attributes["user"], instance_attributes["passwd"])
-    
+    response = __queue_details(instance_name, queue)
     return len(response["consumer_details"])
+
+
+def number_of_messages(instance_name, queue):
+    """
+    Get number of messages in queue
+    """
+    response = __queue_details(instance_name, queue)
+    return response["messages"]
 
 
 def __get(url, user, password):
     return json.loads(get(url, auth=(user, password)).content)
+
+
+def __queue_details(instance_name, queue):
+    instance_attributes = get_rabbitmq_admin_instances()[instance_name]
+    url = __queue_url(QUEUE, instance_attributes, queue)
+    return __get(url, instance_attributes["user"], instance_attributes["passwd"])
+
+
+def __queue_url(api, instance_attributes, queue):
+    return __url(api, instance_attributes["base_url"]).format(
+        __vhost(instance_attributes["vhost"]), queue
+    )
 
 
 def __url(api, admin):

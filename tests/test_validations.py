@@ -4,7 +4,10 @@ from unittest.mock import patch
 
 from lifeguard import NORMAL, PROBLEM
 from lifeguard_rabbitmq.context import RABBITMQ_PLUGIN_CONTEXT
-from lifeguard_rabbitmq.validations import consumers_running_validation
+from lifeguard_rabbitmq.validations import (
+    consumers_running_validation,
+    messages_increasing_validation,
+)
 
 
 class ValidationTest(unittest.TestCase):
@@ -16,6 +19,17 @@ class ValidationTest(unittest.TestCase):
             "queues": {
                 "rabbitmq_admin_instance": [
                     {"name": "queue_name", "min_number_of_consumers": 1}
+                ]
+            },
+        }
+
+        RABBITMQ_PLUGIN_CONTEXT.messages_increasing_validation_options = {
+            "actions": [],
+            "schedule": {"every": {"minutes": 1}},
+            "settings": {},
+            "queues": {
+                "rabbitmq_admin_instance": [
+                    {"name": "queue_name", "count_before_alert": 10}
                 ]
             },
         }
@@ -105,5 +119,125 @@ class ValidationTest(unittest.TestCase):
                         "status": "PROBLEM",
                     }
                 ]
+            },
+        )
+
+    @patch("lifeguard_rabbitmq.validations.number_of_messages")
+    @patch("lifeguard_rabbitmq.validations.logger")
+    def test_messages_increasing_validation_when_normal(
+        self, mock_logger, mock_number_of_messages
+    ):
+        mock_number_of_messages.return_value = 0
+
+        response = messages_increasing_validation()
+
+        mock_number_of_messages.assert_called_with(
+            "rabbitmq_admin_instance", "queue_name"
+        )
+        self.assertEqual(response.validation_name, "messages_increasing_validation")
+        self.assertEqual(response.status, NORMAL)
+        self.assertEqual(
+            response.details,
+            {
+                "rabbitmq_admin_instance": [
+                    {
+                        "content": {
+                            "counter": 0,
+                            "number_of_messages": 0,
+                            "status": "NORMAL",
+                        },
+                        "number_of_messages": 0,
+                        "queue": "queue_name",
+                        "status": "NORMAL",
+                    }
+                ]
+            },
+        )
+        self.assertEqual(
+            RABBITMQ_PLUGIN_CONTEXT.messages_increasing_validation_options,
+            {
+                "actions": [],
+                "queues": {
+                    "rabbitmq_admin_instance": [
+                        {
+                            "count_before_alert": 10,
+                            "last_content": {
+                                "counter": 0,
+                                "number_of_messages": 0,
+                                "status": "NORMAL",
+                            },
+                            "name": "queue_name",
+                        }
+                    ]
+                },
+                "schedule": {"every": {"minutes": 1}},
+                "settings": {},
+            },
+        )
+
+    @patch("lifeguard_rabbitmq.validations.number_of_messages")
+    @patch("lifeguard_rabbitmq.validations.logger")
+    def test_messages_increasing_validation_when_problem(
+        self, mock_logger, mock_number_of_messages
+    ):
+        mock_number_of_messages.return_value = 10
+        RABBITMQ_PLUGIN_CONTEXT.messages_increasing_validation_options = {
+            "actions": [],
+            "queues": {
+                "rabbitmq_admin_instance": [
+                    {
+                        "count_before_alert": 10,
+                        "last_content": {
+                            "counter": 10,
+                            "number_of_messages": 5,
+                            "status": "NORMAL",
+                        },
+                        "name": "queue_name",
+                    }
+                ]
+            },
+            "schedule": {"every": {"minutes": 1}},
+            "settings": {},
+        }
+
+        response = messages_increasing_validation()
+
+        mock_number_of_messages.assert_called_with(
+            "rabbitmq_admin_instance", "queue_name"
+        )
+        self.assertEqual(response.validation_name, "messages_increasing_validation")
+        self.assertEqual(response.status, PROBLEM)
+        self.assertEqual(
+            response.details,
+            {
+                "rabbitmq_admin_instance": [
+                    {
+                        "error": "error on recover queue infos",
+                        "number_of_messages": 10,
+                        "queue": "queue_name",
+                        "status": "PROBLEM",
+                    }
+                ]
+            },
+        )
+        self.assertEqual(
+            RABBITMQ_PLUGIN_CONTEXT.messages_increasing_validation_options,
+            {
+                "actions": [],
+                "queues": {
+                    "rabbitmq_admin_instance": [
+                        {
+                            "count_before_alert": 10,
+                            "last_content": {
+                                "counter": 11,
+                                "number_of_messages": 10,
+                                "status": "PROBLEM",
+                            },
+                            "name": "queue_name",
+                        }
+                    ]
+                },
+                "schedule": {"every": {"minutes": 1}},
+                "settings": {},
             },
         )
