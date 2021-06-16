@@ -1,6 +1,7 @@
 """
 RabbitMQ Plugin Endpoints
 """
+from datetime import datetime
 import json
 
 from lifeguard.controllers import Response

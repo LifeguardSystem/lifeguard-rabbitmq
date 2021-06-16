@@ -71,9 +71,10 @@ def __check_message_increasing(rabbitmq_admin_instance, queues, details):
             and last_content["counter"] > queue["count_before_alert"]
         ):
             last_content["status"] = change_status(last_content["status"], PROBLEM)
-            status = change_status(status, PROBLEM)
+            queue_status["status"] = PROBLEM
 
         if messages < last_content["number_of_messages"] or messages == 0:
+            queue_status["status"] = NORMAL
             last_content["status"] = NORMAL
             last_content["counter"] = 0
             last_content["number_of_messages"] = messages

@@ -78,9 +78,21 @@ class RabbitMQPluginContext:
         Return all attributes in a dict.
         """
         return {
-            "messages_increasing_validation_options": self.messages_increasing_validation_options,
-            "consumers_validation_options": self.consumers_validation_options,
+            "messages_increasing_validation_options": serialize_options(
+                self.messages_increasing_validation_options
+            ),
+            "consumers_validation_options": serialize_options(
+                self.consumers_validation_options
+            ),
         }
+
+
+def serialize_options(options):
+    cloned_options = options.copy()
+    cloned_options["actions"] = [
+        action.__name__ for action in cloned_options["actions"]
+    ]
+    return cloned_options
 
 
 RABBITMQ_PLUGIN_CONTEXT = RabbitMQPluginContext()

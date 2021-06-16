@@ -212,7 +212,11 @@ class ValidationTest(unittest.TestCase):
             {
                 "rabbitmq_admin_instance": [
                     {
-                        "error": "error on recover queue infos",
+                        "content": {
+                            "counter": 11,
+                            "number_of_messages": 10,
+                            "status": "PROBLEM",
+                        },
                         "number_of_messages": 10,
                         "queue": "queue_name",
                         "status": "PROBLEM",
