@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lifeguard-rabbitmq",
-    version="0.0.3",
+    version="0.0.4",
     url="https://github.com/LifeguardSystem/lifeguard-rabbitmq",
     author="Diego Rubin",
     author_email="contact@diegorubin.dev",

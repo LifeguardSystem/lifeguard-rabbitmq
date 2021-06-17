@@ -48,4 +48,4 @@ def __url(api, admin):
 
 
 def __vhost(vhost):
-    return vhost.replace(vhost, "%2f")
+    return vhost.replace("/", "%2f")
