@@ -5,51 +5,55 @@ from lifeguard.settings import SettingsManager
 
 SETTINGS_MANAGER = SettingsManager(
     {
-        "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_BASE_URL": {
+        r"LIFEGUARD_RABBITMQ_\w+_ADMIN_BASE_URL": {
             "default": "http://localhost:15672",
             "description": "RabbitMQ admin base url of default instance",
         },
-        "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_USER": {
+        r"LIFEGUARD_RABBITMQ_\w+_ADMIN_USER": {
             "default": "guest",
             "description": "RabbitMQ admin user of default instance",
         },
-        "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_PASSWD": {
+        r"LIFEGUARD_RABBITMQ_\w+_ADMIN_PASSWD": {
             "default": "guest",
             "description": "RabbitMQ admin password of default instance",
         },
-        "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_VHOST": {
+        r"LIFEGUARD_RABBITMQ_\w+_ADMIN_VHOST": {
             "default": "/",
             "description": "RabbitMQ admin virtual host of default instance",
+        },
+        "LIFEGUARD_RABBITMQ_INSTANCES": {
+            "default": "default",
+            "description": "List of rabbitmq instances separated by comma",
         },
     }
 )
 
-LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_BASE_URL = SETTINGS_MANAGER.read_value(
-    "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_BASE_URL"
-)
-
-LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_USER = SETTINGS_MANAGER.read_value(
-    "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_USER"
-)
-
-LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_PASSWD = SETTINGS_MANAGER.read_value(
-    "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_PASSWD"
-)
-
-LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_VHOST = SETTINGS_MANAGER.read_value(
-    "LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_VHOST"
-)
+LIFEGUARD_RABBITMQ_INSTANCES = SETTINGS_MANAGER.read_value(
+    "LIFEGUARD_RABBITMQ_INSTANCES"
+).split(",")
 
 
 def get_rabbitmq_admin_instances():
     """
     Recover attributes of each RabbitMQ Admin instances
     """
-    return {
-        "default": {
-            "base_url": LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_BASE_URL,
-            "user": LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_USER,
-            "passwd": LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_PASSWD,
-            "vhost": LIFEGUARD_RABBITMQ_DEFAULT_ADMIN_VHOST,
+    instances = {}
+
+    for instance in LIFEGUARD_RABBITMQ_INSTANCES:
+        key = instance.upper()
+        instances[instance] = {
+            "base_url": SETTINGS_MANAGER.read_value(
+                "LIFEGUARD_RABBITMQ_{}_ADMIN_BASE_URL".format(key)
+            ),
+            "user": SETTINGS_MANAGER.read_value(
+                "LIFEGUARD_RABBITMQ_{}_ADMIN_USER".format(key)
+            ),
+            "passwd": SETTINGS_MANAGER.read_value(
+                "LIFEGUARD_RABBITMQ_{}_ADMIN_PASSWD".format(key)
+            ),
+            "vhost": SETTINGS_MANAGER.read_value(
+                "LIFEGUARD_RABBITMQ_{}_ADMIN_VHOST".format(key)
+            ),
         }
-    }
+
+    return instances
