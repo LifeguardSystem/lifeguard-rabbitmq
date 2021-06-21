@@ -100,9 +100,11 @@ class ValidationTest(unittest.TestCase):
 
     @patch("lifeguard_rabbitmq.validations.count_consumers")
     @patch("lifeguard_rabbitmq.validations.logger")
+    @patch("lifeguard_rabbitmq.validations.traceback")
     def test_consumers_running_validation_when_problem_because_integration_error(
-        self, mock_logger, mock_count_consumers
+        self, mock_traceback, mock_logger, mock_count_consumers
     ):
+        mock_traceback.format_exc.return_value = "traceback"
         mock_count_consumers.side_effect = [Exception("error")]
 
         response = consumers_running_validation()
@@ -120,6 +122,9 @@ class ValidationTest(unittest.TestCase):
                     }
                 ]
             },
+        )
+        mock_logger.error.assert_called_with(
+            "error on recover queue infos %s", "error", extra={"traceback": "traceback"}
         )
 
     @patch("lifeguard_rabbitmq.validations.number_of_messages")
