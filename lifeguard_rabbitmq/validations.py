@@ -101,7 +101,9 @@ def consumers_running_validation():
         status = change_status(
             status, __check_consumers(rabbitmq_admin_instance, queues, details)
         )
-    return ValidationResponse("consumers_running_validation", status, details)
+    return ValidationResponse(
+        status, details, validation_name="consumers_running_validation"
+    )
 
 
 def messages_increasing_validation():
@@ -120,4 +122,6 @@ def messages_increasing_validation():
             status, __check_message_increasing(rabbitmq_admin_instance, queues, details)
         )
 
-    return ValidationResponse("messages_increasing_validation", status, details)
+    return ValidationResponse(
+        status, details, validation_name="messages_increasing_validation"
+    )
