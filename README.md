@@ -1,7 +1,5 @@
 # Lifeguard RabbitMQ
 
-[![SourceLevel](https://app.sourcelevel.io/github/LifeguardSystem/-/lifeguard-rabbitmq.svg)](https://app.sourcelevel.io/github/LifeguardSystem/-/lifeguard-rabbitmq)
-
 ## Usage
 
 Configure plugin in `lifeguard_settings.py`.
