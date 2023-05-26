@@ -28,7 +28,6 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Topic :: System :: Monitoring",
-        "Framework :: Lifeguard",
     ],
     packages=find_packages(),
 )
